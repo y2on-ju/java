@@ -15,3 +15,6 @@ public class checkQuestion07 {
 	}
 
 }
+
+//주어진 배열에 음수가 포함되어있으면
+//초기값 세팅 이렇게 하면 됨 int max = Integer.MIN_VALUE;

@@ -20,8 +20,6 @@ public class checkQuestion09 {
 			menuNum = sc.nextInt();
 			
 			
-			
-			
 			switch(menuNum) {
 			case 1 :
 				System.out.print("학생수> ");
@@ -39,7 +37,6 @@ public class checkQuestion09 {
 					System.out.println("scores["+ k + "]:" + scores[k]);
 				}
 				break;
-			
 			case 4 :
 				int max = 0;
 				int sum = 0;
@@ -47,6 +44,7 @@ public class checkQuestion09 {
 					if(scores[i]>max) {
 						max = scores[i];
 					}
+					// 삼항연산자를 이용하여 한줄로 가능 max = (max<scores[i])? scores[i] : max;
 				}
 				System.out.println("최고 점수:" + max);
 				
