@@ -1,7 +1,7 @@
 package javabasic.ch07;
 
 import java.awt.*;
-import java.awt.evet.*;
+import java.awt.event.*;
 
 class Exercise7_9 {
 public static void main(String[] args) {
