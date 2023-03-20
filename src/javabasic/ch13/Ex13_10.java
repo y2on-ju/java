@@ -1,6 +1,6 @@
 package javabasic.ch13;
 
-class Ex13_10_1 {
+class Ex13_10 {
 	public static void main(String args[]) {
 		MyThread th1 =  new MyThread("*");
 		MyThread th2 =  new MyThread("**");
@@ -25,36 +25,14 @@ class Ex13_10_1 {
 	} //main
 }
 
-class MyThread implements Runnable {
-	boolean suspended = false;
-	boolean stopped = false;
-	
-	Thread th;
-	MyThread(String name){
-		th = new Thread(this, name);    //Thread(Runnable r, String name)
-	}
-	
-	void start() {
-		th.start();
-	}
-	void stop() {
-		stopped = true;
-	}
-	void suspend() {
-		suspended = true;
-	}
-	void resume() {
-		suspended = false;
-	}
-	
+class RunImplEx10 implements Runnable {
 	public void run() {
-		while(!stopped) {
-			if(!suspended) {
+		while(true) {
 				System.out.println(Thread.currentThread().getName());
 				try {
 					Thread.sleep(1000);
 				} catch(InterruptedException e) {}
-			}	
-			}
+		     }
+		}
 	}
-	}
+	
