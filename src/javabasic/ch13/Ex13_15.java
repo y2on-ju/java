@@ -1,4 +1,5 @@
 package javabasic.ch13;
+
 //요리사(Cook)는 Table에 음식을 추가, 손님은 Table의 음식 소비
 //요리사와 손님이 같은 객체(Table)공유함 ㅡ> 동기화 필요
 // wait() & notify()적용된 예제
@@ -7,91 +8,108 @@ import java.util.ArrayList;
 class Customer2 implements Runnable {
 	private Table2 table;
 	private String food;
-	
+
 	Customer2(Table2 table, String food) {
 		this.table = table;
 		this.food = food;
 	}
 
+	public void run() {
+		while (true) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+			}
+			String name = Thread.currentThread().getName();
 
-public void run() {
-	while(true) {
-		try { 
-			Thread.sleep(100);
-		}catch(InterruptedException e) {}
-		String name = Thread.currentThread().getName();
-		
-		if(eatFood())
+			table.remove(food);
 			System.out.println(name + "ate a" + food);
-		else
-			System.out.println(name + "failed to eat. :(");
-	}//while
-}
-
-boolean eatFood() {
-	return table.remove(food);
+		} // while
 	}
 }
 
 class Cook2 implements Runnable {
-	private Table table;
-	
-	Cook(Table table){
+	private Table2 table;
+
+	Cook2(Table2 table) {
 		this.table = table;
 	}
+
 	public void run() {
-		while(true) {
-			int idx = (int)(Math.random()*table.dishNum());
+		while (true) {
+			int idx = (int) (Math.random() * table.dishNum());
 			table.add(table.dishNames[idx]);
 			try {
-				Thread.sleep(100);
-			} catch(InterruptedException e) {}
-			}//while
-		}
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+			}
+		} // while
 	}
+}
 
-
-class Table {
-	String[] dishNames = {"donut","donut","burger"};
+class Table2 {
+	String[] dishNames = { "donut", "donut", "burger" }; // donut의 확률을 높인다.
 	final int MAX_FOOD = 6;
 	private ArrayList<String> dishes = new ArrayList<>();
-	public synchronized void add(String dish) { //synchronized를 추가
-		if(dishes.size() >= MAX_FOOD)
-			return;
+
+	public synchronized void add(String dish) {
+		while (dishes.size() >= MAX_FOOD) {
+			String name = Thread.currentThread().getName();
+			System.out.println(name + "is waiting.");
+			try {
+				wait(); // COOK쓰레드를 기다리게 한다.
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+			}
+		}
 		dishes.add(dish);
+		notify(); // 기다리고 있는 CUST를 깨우기 위함.
 		System.out.println("Dishes:" + dishes.toString());
 	}
-	public boolean remove(String dishName) {
-		synchronized(this) {
-			while(dishes.size()==0) {
-				String name = Thread.currentThread().getName();
-				System.out.println(name+" is waiting.");
+
+	public void remove(String dishName) {
+		synchronized (this) {
+			String name = Thread.currentThread().getName();
+
+			while (dishes.size() == 0) {
+				System.out.println(name + "is waiting.");
 				try {
+					wait(); // CUST쓰레드를 기다리게 한다.
 					Thread.sleep(500);
-				}catch(InterruptedException e) {}
-			}
-			for(int i=0; i<dishes.size(); i++)
-				if(dishName.equals(dishes.get(i))) {
-					dishes.remove(i);
-					return true;
+				} catch (InterruptedException e) {
 				}
-			} //synchronized
-		return false;
-		}
+			}
+			while (true) {
+				for (int i = 0; i < dishes.size(); i++)
+					if (dishName.equals(dishes.get(i))) {
+						dishes.remove(i);
+						return;
+			} // for문 끝
+			try {
+				System.out.println(name + "is waiting.");
+				wait(); // 원하는 음식이 없는 CUST쓰레드를 기다리게 한다.
+				Thread.sleep(500);
+			} catch (InterruptedException e) {}
+		} // while(true)
+	}// synchronized
+}
+
+
 	public int dishNum() {
 		return dishNames.length;
 	}
-	}
+}
 
-class Ex13_14 {
-	public static void main(String[] args) throws InterruptedException {
-		Table table = new Table();  //여러 쓰레드가 공유하는 객체
+class Ex13_15 {
+	public static void main(String[] args) throws Exception {
+		Table2 table = new Table2();  //여러 쓰레드가 공유하는 객체
 		
-		new Thread(new Cook(table), "COOK").start();
-		new Thread(new Customer(table, "donut"),"CUST1").start();
-		new Thread(new Customer(table,"burger"), "CUST2").start();
+		new Thread(new Cook2(table), "COOK").start();
+		new Thread(new Customer2(table, "donut"),"CUST1").start();
+		new Thread(new Customer2(table,"burger"), "CUST2").start();
 		
-		Thread.sleep(5000);
+		Thread.sleep(2000);
 		System.exit(0);
 	}
 }
+
