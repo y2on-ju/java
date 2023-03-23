@@ -1,4 +1,4 @@
-package javabasic.ch13;
+package javabasic.ch14;
 @FunctionalInterface
 interface MyFunction {
 	void run();  //public abstract void run();
